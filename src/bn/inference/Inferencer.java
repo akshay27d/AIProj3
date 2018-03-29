@@ -19,6 +19,6 @@ public interface Inferencer {
 	 * Or don't implement this interface at all. It's really here to guide you
 	 * as to what an inferencer should do (namely, compute a posterior distriubution.
 	 */
-	public Distribution ask(BayesianNetwork bn, RandomVariable X, Assignment e);
+	public Distribution enumeration_ask(RandomVariable X, Assignment e, BayesianNetwork bn);
 
 }
