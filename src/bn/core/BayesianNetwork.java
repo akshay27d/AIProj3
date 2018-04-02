@@ -32,7 +32,7 @@ public class BayesianNetwork {
      * corresponds to a random variable, and has parent nodes, child
      * nodes, and a conditional probability table associated with it.
      */
-    protected class Node implements Printable {
+    public class Node implements Printable {
 
 	public RandomVariable variable;
 	public List<Node> parents;

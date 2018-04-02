@@ -28,7 +28,11 @@ public class Assignment extends LinkedHashMap<RandomVariable,Object> {
      * This method is an alias for {@link LinkedHashMap#put}.
      */
     public void set(RandomVariable var, Object val) {
-	put(var, val);
+	   put(var, val);
+    }
+
+    public Object get(RandomVariable var) {
+        return get(var);
     }
 
     /**
