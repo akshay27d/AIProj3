@@ -1,4 +1,5 @@
 import java.util.*;
+import bn.core.*;
 
 public class RejectionSampling {
 
@@ -16,14 +17,16 @@ public class RejectionSampling {
 	public double[] rejection_sampling(RandomVariable X, Assignment e, BayesianNetwork bn, int N) {
 
 		double[] counts = new double[X.getDomain().size()]; //bolded N
-		ArrayList<RandomVariable> list = bn.getVariableListTopologicallySorted();
+		ArrayList<Object> domain = X.getDomain();
+		List<RandomVariable> list = bn.getVariableListTopologicallySorted();
 
 		for(int i = 1; i <= N; i++) {
 
 			HashMap<RandomVariable, Boolean> x = prior_sample(bn);
 
 			if(is_consistent(x, e)) {
-				int y = list.indexOf(X);
+				Object val = x.get(X);
+				int y = domain.indexOf(val);
 				counts[y] = counts[y] + 1;
 
 			}//end if
@@ -42,7 +45,7 @@ public class RejectionSampling {
 		//boolean[] x = new boolean[bn.getVariableList().size()];
 		HashMap<RandomVariable, Boolean> x = new HashMap<RandomVariable, Boolean>();
 
-		ArrayList<RandomVariable> list = bn.getVariableListTopologicallySorted();
+		List<RandomVariable> list = bn.getVariableListTopologicallySorted();
 
 		for(int i = 0; i < list.size(); i++) {
 
@@ -74,7 +77,7 @@ public class RejectionSampling {
 	public Assignment get_parents(RandomVariable rv, BayesianNetwork bn) {
 
 		BayesianNetwork.Node node = bn.getNodeForVariable(rv);
-		ArrayList<BayesianNetwork.Node> parents = node.parents;
+		List<BayesianNetwork.Node> parents = node.parents;
 		Assignment ass = new Assignment();
 
 		for(BayesianNetwork.Node n : parents) {
@@ -104,7 +107,7 @@ public class RejectionSampling {
 
 
 
-
+		return new double[34];
 	}//end normalize method
 
 
