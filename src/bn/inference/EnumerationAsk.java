@@ -13,6 +13,7 @@ public class EnumerationAsk implements Inferencer{
 		Assignment evidenceVariables= new Assignment();
 		BayesianNetwork network = null;
 
+
 		if (filename.endsWith(".xml")){
 			XMLBIFParser parser = new XMLBIFParser();
 			try{
@@ -58,10 +59,8 @@ public class EnumerationAsk implements Inferencer{
 
 		Distribution Q = new Distribution(X);
 		for(Object Xi : X.getDomain()) {
-			Assignment pAssign = e.copy();
-
-			pAssign.set(X, Xi);
-			Q.put(Xi, enumerate_all(bn.getVariableListTopologicallySorted(), pAssign, bn));
+			e.set(X, Xi);
+			Q.put(Xi, enumerate_all(bn.getVariableListTopologicallySorted(), e, bn));
 
 		}
 
@@ -76,7 +75,7 @@ public class EnumerationAsk implements Inferencer{
 		}
 		RandomVariable Y = vars.get(0);
 
-		if(e.containsKey(Y)){
+		if(e.containsKey(Y)){ //is th
 			Assignment pAssign = e.copy();
 
 			return bn.getProb(Y,pAssign) * enumerate_all(rest(vars),e, bn);

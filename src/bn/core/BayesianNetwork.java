@@ -145,7 +145,7 @@ public class BayesianNetwork {
      * Return the Node for given RandomVariable from this BayesianNetwork.
      * @throws NoSuchElementException
      */
-    protected Node getNodeForVariable(RandomVariable var) {
+    public Node getNodeForVariable(RandomVariable var) {
 	for (Node node : nodes) {
 	    if (node.variable == var) {
 		return node;
