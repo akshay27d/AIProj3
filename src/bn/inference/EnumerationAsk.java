@@ -44,6 +44,7 @@ public class EnumerationAsk implements Inferencer{
 			}
 		}
 		EnumerationAsk e = new EnumerationAsk();
+
 		Distribution x = e.enumeration_ask(network.getVariableByName(queryVariable), evidenceVariables, network);
 	}//end main
 
@@ -71,18 +72,16 @@ public class EnumerationAsk implements Inferencer{
 
 		if(e.containsKey(Y)){ //is th
 			Assignment pAssign = e.copy();
-			vars.remove(0);
 
 			return bn.getProb(Y,pAssign) * enumerate_all(rest(vars),e, bn);
 		}
 		else{
 			double summation=0;
-			vars.remove(0);
 
 			for(Object Yi : Y.getDomain()) {
 				Assignment pAssign = e.copy();
 				pAssign.set(Y, Yi);
-				summation += bn.getProb(Y,pAssign) * enumerate_all(rest(vars),e ,bn);
+				summation += bn.getProb(Y,pAssign) * enumerate_all(rest(vars),pAssign ,bn);
 
 			}
 
