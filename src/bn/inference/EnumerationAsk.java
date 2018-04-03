@@ -43,11 +43,13 @@ public class EnumerationAsk implements Inferencer{
 			evidenceVariables.set(network.getVariableByName(args[i]), args[i+1]);
 		}
 
-		network.print();
+		// network.print();
 
 		EnumerationAsk e = new EnumerationAsk();
 
 		Distribution x = e.enumeration_ask(network.getVariableByName(queryVariable), evidenceVariables, network);
+		x.print();
+
 	}//end main
 
 

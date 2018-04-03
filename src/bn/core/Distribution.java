@@ -74,4 +74,35 @@ public class Distribution extends LinkedHashMap<Object,Double> {
 	}
     }
 
+
+    public void print(){
+        System.out.println("Posterior Distribution of the Query Variable:");
+        for (Object key : keySet()){
+            System.out.println(key.toString() +" "+ get(key));
+        }
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
