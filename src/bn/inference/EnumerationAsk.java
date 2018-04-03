@@ -69,7 +69,7 @@ public class EnumerationAsk implements Inferencer{
 		}
 		RandomVariable Y = vars.get(0);
 
-		if(e.containsKey(Y)){
+		if(e.containsKey(Y)){ 
 			Assignment pAssign = e.copy();
 			vars.remove(0);
 
