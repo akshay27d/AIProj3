@@ -13,11 +13,6 @@ public class EnumerationAsk implements Inferencer{
 		Assignment evidenceVariables= new Assignment();
 		BayesianNetwork network = null;
 
-		for (int i = 2; i< args.length; i+=2){
-			evidenceVariables.set(new RandomVariable(args[i]), Boolean.valueOf(args[i+1]));
-		}
-
-
 		if (filename.endsWith(".xml")){
 			XMLBIFParser parser = new XMLBIFParser();
 			try{
@@ -43,6 +38,13 @@ public class EnumerationAsk implements Inferencer{
 				System.exit(0);
 			}
 		}
+
+		for (int i = 2; i< args.length; i+=2){
+			evidenceVariables.set(network.getVariableByName(args[i]), args[i+1]);
+		}
+
+		network.print();
+
 		EnumerationAsk e = new EnumerationAsk();
 		Distribution x = e.enumeration_ask(network.getVariableByName(queryVariable), evidenceVariables, network);
 	}//end main
@@ -53,8 +55,10 @@ public class EnumerationAsk implements Inferencer{
 
 		Distribution Q = new Distribution(X);
 		for(Object Xi : X.getDomain()) {
-			e.set(X, Xi);
-			Q.put(Xi, enumerate_all(bn.getVariableListTopologicallySorted(), e, bn));
+			Assignment pAssign = e.copy();
+
+			pAssign.set(X, Xi);
+			Q.put(Xi, enumerate_all(bn.getVariableListTopologicallySorted(), pAssign, bn));
 
 		}
 

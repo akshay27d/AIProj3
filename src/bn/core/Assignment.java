@@ -31,7 +31,7 @@ public class Assignment extends LinkedHashMap<RandomVariable,Object> {
 	   put(var, val);
     }
 
-    public Object get(RandomVariable var) {
+    public Object receive(RandomVariable var) {
         return get(var);
     }
 
