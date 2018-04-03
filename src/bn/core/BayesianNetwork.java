@@ -333,7 +333,7 @@ public class BayesianNetwork {
     // Testing
 
     protected void trace(String msg) {
-	System.err.println(msg);
+	//System.err.println(msg);
     }
 
     /**

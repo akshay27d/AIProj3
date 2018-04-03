@@ -13,6 +13,11 @@ public class EnumerationAsk implements Inferencer{
 		Assignment evidenceVariables= new Assignment();
 		BayesianNetwork network = null;
 
+		for (int i = 2; i< args.length; i+=2){
+			evidenceVariables.set(new RandomVariable(args[i]), Boolean.valueOf(args[i+1]));
+		}
+
+
 		if (filename.endsWith(".xml")){
 			XMLBIFParser parser = new XMLBIFParser();
 			try{
@@ -38,13 +43,6 @@ public class EnumerationAsk implements Inferencer{
 				System.exit(0);
 			}
 		}
-
-		for (int i = 2; i< args.length; i+=2){
-			evidenceVariables.set(network.getVariableByName(args[i]), args[i+1]);
-		}
-
-		network.print();
-
 		EnumerationAsk e = new EnumerationAsk();
 		Distribution x = e.enumeration_ask(network.getVariableByName(queryVariable), evidenceVariables, network);
 	}//end main
@@ -55,10 +53,8 @@ public class EnumerationAsk implements Inferencer{
 
 		Distribution Q = new Distribution(X);
 		for(Object Xi : X.getDomain()) {
-			Assignment pAssign = e.copy();
-
-			pAssign.set(X, Xi);
-			Q.put(Xi, enumerate_all(bn.getVariableListTopologicallySorted(), pAssign, bn));
+			e.set(X, Xi);
+			Q.put(Xi, enumerate_all(bn.getVariableListTopologicallySorted(), e, bn));
 
 		}
 
@@ -73,7 +69,7 @@ public class EnumerationAsk implements Inferencer{
 		}
 		RandomVariable Y = vars.get(0);
 
-		if(e.containsKey(Y)){ 
+		if(e.containsKey(Y)){ //is th
 			Assignment pAssign = e.copy();
 			vars.remove(0);
 
