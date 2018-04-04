@@ -8,7 +8,7 @@ public class RejectionSampling {
 
 
 	public static void main(String[] args) {
-
+		//hi
 		int numSamples = Integer.parseInt(args[0]);
 		String filename = args[1];
 		String queryVariable = args[2];
