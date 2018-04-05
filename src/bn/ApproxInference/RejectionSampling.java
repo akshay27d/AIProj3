@@ -73,7 +73,7 @@ public class RejectionSampling {
 				int y = domain.indexOf(val);
 				counts[y] = counts[y] + 1;
 
-				System.out.println(val + "   " + y);
+				//System.out.println(val + "   " + y);
 
 			}//end if
 
@@ -161,7 +161,7 @@ public class RejectionSampling {
 
 		//want to make all the variables add up to 1
 
-		//add up all things, and then divide 1 by sum and then multiply by that number
+		//add up all things, and then divide by sum 
 
 		double sum = 0;
 
