@@ -49,8 +49,11 @@ public class RejectionSampling {
 		RejectionSampling rs = new RejectionSampling();
 		double[] output = rs.rejection_sampling(network.getVariableByName(queryVariable), evidenceVariables, network, numSamples);
 
+		ArrayList<Object> domain = network.getVariableByName(queryVariable).getDomain();
+
+
 		for(int i = 0; i < output.length; i++) {
-			System.out.println(output[i]);
+			System.out.println(domain.get(i) + " = P(" + output[i]+")");
 		}
 
 
@@ -63,17 +66,16 @@ public class RejectionSampling {
 		double[] counts = new double[X.getDomain().size()]; //bolded N
 		ArrayList<Object> domain = X.getDomain();
 		List<RandomVariable> list = bn.getVariableListTopologicallySorted();
+		Assignment initialGiven = e.copy();
 
 		for(int i = 1; i <= N; i++) {
 
 			HashMap<RandomVariable, Object> x = prior_sample(bn, e);
 
-			if(is_consistent(x, e)) {
+			if(is_consistent(x, initialGiven)) {
 				Object val = x.get(X);
 				int y = domain.indexOf(val);
 				counts[y] = counts[y] + 1;
-
-				//System.out.println(val + "   " + y);
 
 			}//end if
 
@@ -88,7 +90,6 @@ public class RejectionSampling {
 
 	public HashMap<RandomVariable, Object> prior_sample(BayesianNetwork bn, Assignment e) {
 
-		//boolean[] x = new boolean[bn.getVariableList().size()];
 		HashMap<RandomVariable, Object> x = new HashMap<RandomVariable, Object>();
 
 		List<RandomVariable> list = bn.getVariableListTopologicallySorted();
@@ -102,12 +103,13 @@ public class RejectionSampling {
 				probabilities.add(prob);
 
 			}
+
 			//Assign value
 			int idx = assignValue(probabilities);
 			x.put(X, X.getDomain().get(idx));
 
 		}
-
+		// System.exit(0);
 		return x;
 
 	}//end prior_sample method
@@ -124,8 +126,6 @@ public class RejectionSampling {
 			y = y+probs.get(i);
 		}
 
-		System.out.print("assignValue done fucked");
-		System.exit(0);
 		return 0;
 	}
 
@@ -146,12 +146,13 @@ public class RejectionSampling {
 
 	public boolean is_consistent(HashMap<RandomVariable, Object> x, Assignment e) {
 
-		for(RandomVariable rv : e.variableSet()) {			
-			if((x.get(rv) != null) && (e.receive(rv) != x.get(rv)))
+		for(RandomVariable rv : e.variableSet()) {	
+			// System.out.println(rv + " = " + e.receive(rv));		
+			if(!x.get(rv).equals(e.receive(rv)))
 				return false;
 
 		}
-
+		// System.exit(0);
 		return true;
 
 	}//end is_consistent method
