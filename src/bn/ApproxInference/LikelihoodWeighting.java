@@ -7,17 +7,64 @@ import bn.parser.*;
 public class LikelihoodWeighting {
 
 	public static void main(String[] args) {
+		int numSamples = Integer.parseInt(args[0]);
+		String filename = args[1];
+		String queryVariable = args[2];
+		Assignment evidenceVariables= new Assignment();
+		BayesianNetwork network = null;
+
+
+		if (filename.endsWith(".xml")){
+			XMLBIFParser parser = new XMLBIFParser();
+			try{
+				network = parser.readNetworkFromFile("bn/examples/"+filename);
+			} catch(Exception e){
+				System.out.println("Error parsing Bayesian Network 1");
+				System.exit(0);
+			}
+		}
+		else{
+			BIFParser parser = null;
+			try{
+				parser = new BIFParser(new FileInputStream("bn/examples/"+filename));
+			} catch(Exception e){
+				System.out.println("Error parsing Bayesian Network 2");
+				System.exit(0);
+			}
+
+			try{
+				network = parser.parseNetwork();
+			} catch(Exception e){
+				System.out.println("Error parsing Bayesian Network 3");
+				System.exit(0);
+			}
+		}
+
+		for (int i = 3; i< args.length; i+=2){
+			evidenceVariables.set(network.getVariableByName(args[i]), args[i+1]);
+		}
+
+		LikelihoodWeighting rs = new LikelihoodWeighting();
+		double[] output = rs.likelihood_weighting(network.getVariableByName(queryVariable), evidenceVariables, network, numSamples);
+
+		ArrayList<Object> domain = network.getVariableByName(queryVariable).getDomain();
+
+
+		for(int i = 0; i < output.length; i++) {
+			System.out.println(domain.get(i) + " = P(" + output[i]+")");
+		}
 
 	}//end main method
 
 
-	public double likelihood_weighting(RandomVariable X, Assignment e, BayesianNetwork bn, int N) {
+	public double[] likelihood_weighting(RandomVariable X, Assignment e, BayesianNetwork bn, int N) {
 
 		double[] W = new double[X.getDomain().size()];
 
 		for(int j = 1; j <= N; j++) {
-			//event, weight = weighted_sample(bn, e);
-			//W[italics x] = w[italics x] + weight where italics x is value of X in event
+			EventWeight ew = weighted_sample(bn, e, X);
+			int x = ;//value of X in event
+			W[x] = W[x] + ew.weight;
 		}
 
 		return normalize(W);
@@ -25,23 +72,29 @@ public class LikelihoodWeighting {
 	}//end likelihood_weighting method
 
 
-	public EventWeight weighted_sample(BayesianNetwork bn, Assignment e){
+	public EventWeight weighted_sample(BayesianNetwork bn, Assignment e, RandomVariable X){
 		double w = 1;
-		boolean[] x = new boolean[e.getVariableList().size()];
+		Object[] x = new Object[e.variableSet().size()];
+		
+		int i = 0;
+		for(RandomVariable rv : e.variableSet()) {
+			x[i] = e.receive(X);
+		}
 
-		int i =0;
+		i =0;
 		for (RandomVariable rv : bn.getVariableListTopologicallySorted()){
 			if (e.containsKey(rv)){
-				w = w * /* P(rv=x | parents(rv))*/
+				w = w;/* P(rv=x | parents(rv))*/
 			}
 			else{
-				x[i] = random_sample(rv, /* parents(rv*/);
+				x[i] = random_sample(rv, bn, e);
 			}
 			i++;
 		}
 
 		return new EventWeight(x, w);
-	}
+
+	}//end weighter_sample 
 
 	public boolean random_sample(RandomVariable rv, BayesianNetwork bn, Assignment e) {
 
@@ -60,12 +113,8 @@ public class LikelihoodWeighting {
 		}
 
 
+
 	}//end random_sample method
-
-
-
-
-
 
 
 	public double[] normalize(double[] counts) {
