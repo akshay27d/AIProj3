@@ -66,12 +66,14 @@ public class RejectionSampling {
 
 		for(int i = 1; i <= N; i++) {
 
-			HashMap<RandomVariable, Boolean> x = prior_sample(bn);
+			HashMap<RandomVariable, Object> x = prior_sample(bn, e);
 
 			if(is_consistent(x, e)) {
 				Object val = x.get(X);
 				int y = domain.indexOf(val);
 				counts[y] = counts[y] + 1;
+
+				System.out.println(val + "   " + y);
 
 			}//end if
 
@@ -84,16 +86,25 @@ public class RejectionSampling {
 
 
 
-	public HashMap<RandomVariable, Boolean> prior_sample(BayesianNetwork bn) {
+	public HashMap<RandomVariable, Object> prior_sample(BayesianNetwork bn, Assignment e) {
 
 		//boolean[] x = new boolean[bn.getVariableList().size()];
-		HashMap<RandomVariable, Boolean> x = new HashMap<RandomVariable, Boolean>();
+		HashMap<RandomVariable, Object> x = new HashMap<RandomVariable, Object>();
 
 		List<RandomVariable> list = bn.getVariableListTopologicallySorted();
 
-		for(int i = 0; i < list.size(); i++) {
+		for(RandomVariable X : list) {
+			ArrayList<Double> probabilities = new ArrayList<Double>();
+			for (Object d : X.getDomain()){
 
-			x.put(list.get(i), random_sample(list.get(i), bn));
+				e.set(X,d);
+				double prob = bn.getProb(X, e);
+				probabilities.add(prob);
+
+			}
+			//Assign value
+			int idx = assignValue(probabilities);
+			x.put(X, X.getDomain().get(idx));
 
 		}
 
@@ -101,43 +112,42 @@ public class RejectionSampling {
 
 	}//end prior_sample method
 
-	public boolean random_sample(RandomVariable rv, BayesianNetwork bn) {
-
+	public int assignValue(ArrayList<Double> probs){
 		Random r = new Random();
-		double value = r.nextInt(11)/10;
+		double value = (double)r.nextInt(11)/10.0;
 
-		double prob = bn.getProb(rv, get_parents(rv, bn));
-
-		if(value <= prob) {
-			return true;
-		}
-		else{
-			return false;
-		}
-
-
-	}//end random_sample method
-
-	public Assignment get_parents(RandomVariable rv, BayesianNetwork bn) {
-
-		BayesianNetwork.Node node = bn.getNodeForVariable(rv);
-		List<BayesianNetwork.Node> parents = node.parents;
-		Assignment ass = new Assignment();
-
-		for(BayesianNetwork.Node n : parents) {
-			ass.set(n.variable, true);
+		double y=0;
+		for (int i =0; i < probs.size(); i++){
+			if (value >=y && value <= y+probs.get(i)){
+				return i;
+			}
+			y = y+probs.get(i);
 		}
 
-		return ass;
+		System.out.print("assignValue done fucked");
+		System.exit(0);
+		return 0;
+	}
 
-	}//end get_parents method
+	// public Assignment get_parents(RandomVariable rv, BayesianNetwork bn) {
+
+	// 	BayesianNetwork.Node node = bn.getNodeForVariable(rv);
+	// 	List<BayesianNetwork.Node> parents = node.parents;
+	// 	Assignment ass = new Assignment();
+
+	// 	for(BayesianNetwork.Node n : parents) {
+	// 		ass.set(n.variable, true);
+	// 	}
+
+	// 	return ass;
+
+	// }//end get_parents method
 
 
-	public boolean is_consistent(HashMap<RandomVariable, Boolean> x, Assignment e) {
+	public boolean is_consistent(HashMap<RandomVariable, Object> x, Assignment e) {
 
-		for(RandomVariable rv : x.keySet()) {
-			
-			if(e.receive(rv) != x.get(rv))
+		for(RandomVariable rv : e.variableSet()) {			
+			if((x.get(rv) != null) && (e.receive(rv) != x.get(rv)))
 				return false;
 
 		}

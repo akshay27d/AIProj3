@@ -25,7 +25,42 @@ public class LikelihoodWeighting {
 	}//end likelihood_weighting method
 
 
-	public header
+	public EventWeight weighted_sample(BayesianNetwork bn, Assignment e){
+		double w = 1;
+		boolean[] x = new boolean[e.getVariableList().size()];
+
+		int i =0;
+		for (RandomVariable rv : bn.getVariableListTopologicallySorted()){
+			if (e.containsKey(rv)){
+				w = w * /* P(rv=x | parents(rv))*/
+			}
+			else{
+				x[i] = random_sample(rv, /* parents(rv*/);
+			}
+			i++;
+		}
+
+		return new EventWeight(x, w);
+	}
+
+	public boolean random_sample(RandomVariable rv, BayesianNetwork bn, Assignment e) {
+
+		Random r = new Random();
+		double value = ((double)r.nextInt(11))/10.0;
+
+		e.set(rv, true);
+		double prob=bn.getProb(rv, e/*get_parents(rv,bn)*/);
+
+
+		if(value <= prob) {
+			return true;
+		}
+		else{
+			return false;
+		}
+
+
+	}//end random_sample method
 
 
 
