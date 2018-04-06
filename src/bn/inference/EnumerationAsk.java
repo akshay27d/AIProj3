@@ -8,13 +8,13 @@ import bn.parser.*;
 public class EnumerationAsk implements Inferencer{
 
 	public static void main(String[] args) {
-		String filename = args[0];
+		String filename = args[0];					//Take in command line args
 		String queryVariable = args[1];
 		Assignment evidenceVariables= new Assignment();
 		BayesianNetwork network = null;
 
 
-		if (filename.endsWith(".xml")){
+		if (filename.endsWith(".xml")){					//parse file
 			XMLBIFParser parser = new XMLBIFParser();
 			try{
 				network = parser.readNetworkFromFile("bn/examples/"+filename);
@@ -44,12 +44,11 @@ public class EnumerationAsk implements Inferencer{
 			evidenceVariables.set(network.getVariableByName(args[i]), args[i+1]);
 		}
 
-		// network.print();
 
 		EnumerationAsk e = new EnumerationAsk();
-
+		//Do work
 		Distribution x = e.enumeration_ask(network.getVariableByName(queryVariable), evidenceVariables, network);
-		x.print();
+		x.print();			//Print out result
 
 	}//end main
 
@@ -58,9 +57,9 @@ public class EnumerationAsk implements Inferencer{
 	public Distribution enumeration_ask(RandomVariable X, Assignment e, BayesianNetwork bn){
 
 		Distribution Q = new Distribution(X);
-		for(Object Xi : X.getDomain()) {
+		for(Object Xi : X.getDomain()) {		//Go through domain
 			e.set(X, Xi);
-			Q.put(Xi, enumerate_all(bn.getVariableListTopologicallySorted(), e, bn));
+			Q.put(Xi, enumerate_all(bn.getVariableListTopologicallySorted(), e, bn));	//enumerate all
 
 		}
 
@@ -70,15 +69,15 @@ public class EnumerationAsk implements Inferencer{
 	}//end of enumeration_ask method
 
 	public double enumerate_all(List<RandomVariable> vars, Assignment e, BayesianNetwork bn) {
-		if(vars.isEmpty()) {
-			return 1.0;
+		if(vars.isEmpty()) {		//if empty
+			return 1.0;	
 		}
-		RandomVariable Y = vars.get(0);
+		RandomVariable Y = vars.get(0);		//get 1st variable
 
 		if(e.containsKey(Y)){ //is th
 			Assignment pAssign = e.copy();
 
-			return bn.getProb(Y,pAssign) * enumerate_all(rest(vars),e, bn);
+			return bn.getProb(Y,pAssign) * enumerate_all(rest(vars),e, bn);	
 		}
 		else{
 			double summation=0;
@@ -97,7 +96,7 @@ public class EnumerationAsk implements Inferencer{
 	} //end enumerate_all method
 
 
-	public ArrayList<RandomVariable> rest(List<RandomVariable> vars) {
+	public ArrayList<RandomVariable> rest(List<RandomVariable> vars) {		//return tail of list (index 1 through end)
 		ArrayList<RandomVariable> copy = new ArrayList<RandomVariable>();
 
 		for(RandomVariable r : vars) {

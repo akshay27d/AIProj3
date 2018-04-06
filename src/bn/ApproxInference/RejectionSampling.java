@@ -9,14 +9,14 @@ public class RejectionSampling {
 
 	public static void main(String[] args) {
 		
-		int numSamples = Integer.parseInt(args[0]);
+		int numSamples = Integer.parseInt(args[0]);		//Take in command line args
 		String filename = args[1];
 		String queryVariable = args[2];
 		Assignment evidenceVariables= new Assignment();
 		BayesianNetwork network = null;
 
 
-		if (filename.endsWith(".xml")){
+		if (filename.endsWith(".xml")){						//parse file
 			XMLBIFParser parser = new XMLBIFParser();
 			try{
 				network = parser.readNetworkFromFile("bn/examples/"+filename);
@@ -46,14 +46,14 @@ public class RejectionSampling {
 			evidenceVariables.set(network.getVariableByName(args[i]), args[i+1]);
 		}
 
-		RejectionSampling rs = new RejectionSampling();
+		RejectionSampling rs = new RejectionSampling();			//Do work
 		double[] output = rs.rejection_sampling(network.getVariableByName(queryVariable), evidenceVariables, network, numSamples);
 
 		ArrayList<Object> domain = network.getVariableByName(queryVariable).getDomain();
 
 
-		for(int i = 0; i < output.length; i++) {
-			System.out.println(domain.get(i) + " = P(" + output[i]+")");
+		for(int i = 0; i < output.length; i++) {		//Print out result
+			System.out.println(domain.get(i) + " = " + output[i]);
 		}
 
 
@@ -70,9 +70,9 @@ public class RejectionSampling {
 
 		for(int i = 1; i <= N; i++) {
 
-			HashMap<RandomVariable, Object> x = prior_sample(bn, e);
+			HashMap<RandomVariable, Object> x = prior_sample(bn, e);	//get sample
 
-			if(is_consistent(x, initialGiven)) {
+			if(is_consistent(x, initialGiven)) {		//Check if consistant
 				Object val = x.get(X);
 				int y = domain.indexOf(val);
 				counts[y] = counts[y] + 1;
@@ -94,12 +94,12 @@ public class RejectionSampling {
 
 		List<RandomVariable> list = bn.getVariableListTopologicallySorted();
 
-		for(RandomVariable X : list) {
+		for(RandomVariable X : list) {			//go through variables
 			ArrayList<Double> probabilities = new ArrayList<Double>();
 			for (Object d : X.getDomain()){
 
-				e.set(X,d);
-				double prob = bn.getProb(X, e);
+				e.set(X,d);					//Set to val of domain
+				double prob = bn.getProb(X, e);	//Get Probability
 				probabilities.add(prob);
 
 			}
@@ -109,17 +109,16 @@ public class RejectionSampling {
 			x.put(X, X.getDomain().get(idx));
 
 		}
-		// System.exit(0);
 		return x;
 
 	}//end prior_sample method
 
 	public int assignValue(ArrayList<Double> probs){
 		Random r = new Random();
-		double value = (double)r.nextInt(11)/10.0;
+		double value = (double)r.nextInt(11)/10.0;		//pick number 0.0 to 1.0
 
 		double y=0;
-		for (int i =0; i < probs.size(); i++){
+		for (int i =0; i < probs.size(); i++){			//Have boundaries according to probabilities to assign a value
 			if (value >=y && value <= y+probs.get(i)){
 				return i;
 			}
@@ -129,26 +128,11 @@ public class RejectionSampling {
 		return 0;
 	}
 
-	// public Assignment get_parents(RandomVariable rv, BayesianNetwork bn) {
-
-	// 	BayesianNetwork.Node node = bn.getNodeForVariable(rv);
-	// 	List<BayesianNetwork.Node> parents = node.parents;
-	// 	Assignment ass = new Assignment();
-
-	// 	for(BayesianNetwork.Node n : parents) {
-	// 		ass.set(n.variable, true);
-	// 	}
-
-	// 	return ass;
-
-	// }//end get_parents method
-
 
 	public boolean is_consistent(HashMap<RandomVariable, Object> x, Assignment e) {
 
-		for(RandomVariable rv : e.variableSet()) {	
-			// System.out.println(rv + " = " + e.receive(rv));		
-			if(!x.get(rv).equals(e.receive(rv)))
+		for(RandomVariable rv : e.variableSet()) {		
+			if(!x.get(rv).equals(e.receive(rv)))		//Checks if x clashes with e
 				return false;
 
 		}

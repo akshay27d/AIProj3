@@ -7,14 +7,13 @@ import bn.parser.*;
 public class LikelihoodWeighting {
 
 	public static void main(String[] args) {
-		int numSamples = Integer.parseInt(args[0]);
+		int numSamples = Integer.parseInt(args[0]);			//Take in command line args
 		String filename = args[1];
 		String queryVariable = args[2];
 		Assignment evidenceVariables= new Assignment();
 		BayesianNetwork network = null;
 
-
-		if (filename.endsWith(".xml")){
+		if (filename.endsWith(".xml")){					//parse file
 			XMLBIFParser parser = new XMLBIFParser();
 			try{
 				network = parser.readNetworkFromFile("bn/examples/"+filename);
@@ -44,14 +43,14 @@ public class LikelihoodWeighting {
 			evidenceVariables.set(network.getVariableByName(args[i]), args[i+1]);
 		}
 
-		LikelihoodWeighting rs = new LikelihoodWeighting();
+			LikelihoodWeighting rs = new LikelihoodWeighting();		//Do work
 		double[] output = rs.likelihood_weighting(network.getVariableByName(queryVariable), evidenceVariables, network, numSamples);
 
 		ArrayList<Object> domain = network.getVariableByName(queryVariable).getDomain();
 
 
-		for(int i = 0; i < output.length; i++) {
-			System.out.println(domain.get(i) + " = P(" + output[i]+")");
+		for(int i = 0; i < output.length; i++) {				//Print out result
+			System.out.println(domain.get(i) + " = " + output[i]);
 		}
 
 	}//end main method
@@ -60,11 +59,13 @@ public class LikelihoodWeighting {
 	public double[] likelihood_weighting(RandomVariable X, Assignment e, BayesianNetwork bn, int N) {
 
 		double[] W = new double[X.getDomain().size()];
+		ArrayList<Object> list = X.getDomain();
 
 		for(int j = 1; j <= N; j++) {
 			EventWeight ew = weighted_sample(bn, e, X);
-			int x = ;//value of X in event
-			W[x] = W[x] + ew.weight;
+			HashMap<RandomVariable, Object> x = ew.event;	//value of X in event
+			Object d = x.get(X);
+			W[list.indexOf(d)] = W[list.indexOf(d)] + ew.weight;//W.put(X, W.get(X) + ew.weight);
 		}
 
 		return normalize(W);
@@ -74,47 +75,66 @@ public class LikelihoodWeighting {
 
 	public EventWeight weighted_sample(BayesianNetwork bn, Assignment e, RandomVariable X){
 		double w = 1;
-		Object[] x = new Object[e.variableSet().size()];
-		
-		int i = 0;
-		for(RandomVariable rv : e.variableSet()) {
-			x[i] = e.receive(X);
+		HashMap<RandomVariable,Object> x = new HashMap<RandomVariable,Object>();
+		Assignment check = e.copy();
+
+		for (RandomVariable rv : e.variableSet()){			//initialize elements	
+			x.put(rv, e.receive(rv));
 		}
 
-		i =0;
-		for (RandomVariable rv : bn.getVariableListTopologicallySorted()){
-			if (e.containsKey(rv)){
-				w = w;/* P(rv=x | parents(rv))*/
+		int i =0;
+		for (RandomVariable rv : bn.getVariableListTopologicallySorted()){	//go through variables
+
+			for(Object dom : rv.getDomain()){
+				if (e.receive(rv) != null && e.receive(rv).equals(dom)){	//if Xi has value xi
+
+					e.set(rv, dom);
+					double tempW = bn.getProb(rv,e);
+
+					w = w*tempW;			//w = w+ P(Xi=xi | parents(Xi))
+				}
+					
+				else{
+
+					ArrayList<Double> probabilities = new ArrayList<Double>();
+					for (Object d : X.getDomain()){
+
+						e.set(rv,d);
+						double prob = bn.getProb(rv, e);	//P(Xi| parents(Xi))
+						probabilities.add(prob);
+
+					}
+
+					//Assign value
+					int idx = assignValue(probabilities);
+					x.put(rv, rv.getDomain().get(idx));
+				}
 			}
-			else{
-				x[i] = random_sample(rv, bn, e);
-			}
+
 			i++;
 		}
 
-		return new EventWeight(x, w);
+		return new EventWeight(x, w);		//Returns an event and weight
 
 	}//end weighter_sample 
 
-	public boolean random_sample(RandomVariable rv, BayesianNetwork bn, Assignment e) {
-
-		Random r = new Random();
-		double value = ((double)r.nextInt(11))/10.0;
-
-		e.set(rv, true);
-		double prob=bn.getProb(rv, e/*get_parents(rv,bn)*/);
 
 
-		if(value <= prob) {
-			return true;
-		}
-		else{
-			return false;
+	public int assignValue(ArrayList<Double> probs){		
+		Random r = new Random();	
+		double value = (double)r.nextInt(11)/10.0;		////pick number 0.0 to 1.0
+
+		double y=0;
+		for (int i =0; i < probs.size(); i++){			//Have boundaries according to probabilities to assign a value
+			if (value >=y && value <= y+probs.get(i)){
+				return i;
+			}
+			y = y+probs.get(i);
 		}
 
+		return 0;
+	}
 
-
-	}//end random_sample method
 
 
 	public double[] normalize(double[] counts) {
