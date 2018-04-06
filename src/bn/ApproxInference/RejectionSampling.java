@@ -105,7 +105,7 @@ public class RejectionSampling {
 			}
 
 			//Assign value
-			int idx = assignValue(probabilities);
+			int idx = assign_value(probabilities);
 			x.put(X, X.getDomain().get(idx));
 
 		}
@@ -113,9 +113,9 @@ public class RejectionSampling {
 
 	}//end prior_sample method
 
-	public int assignValue(ArrayList<Double> probs){
+	public int assign_value(ArrayList<Double> probs){
 		Random r = new Random();
-		double value = (double)r.nextInt(11)/10.0;		//pick number 0.0 to 1.0
+		double value = (double)r.nextInt(11)/10.0;	//pick number 0.0 to 1.0
 
 		double y=0;
 		for (int i =0; i < probs.size(); i++){			//Have boundaries according to probabilities to assign a value

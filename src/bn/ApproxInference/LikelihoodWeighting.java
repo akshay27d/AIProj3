@@ -106,7 +106,7 @@ public class LikelihoodWeighting {
 					}
 
 					//Assign value
-					int idx = assignValue(probabilities);
+					int idx = assign_value(probabilities);
 					x.put(rv, rv.getDomain().get(idx));
 				}
 			}
@@ -120,7 +120,7 @@ public class LikelihoodWeighting {
 
 
 
-	public int assignValue(ArrayList<Double> probs){		
+	public int assign_value(ArrayList<Double> probs){		
 		Random r = new Random();	
 		double value = (double)r.nextInt(11)/10.0;		////pick number 0.0 to 1.0
 
